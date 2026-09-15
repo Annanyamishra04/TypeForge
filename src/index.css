@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  html[data-theme="paper"] {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-bg text-text-primary font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    position: relative;
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+
+  /*
+   * Per-theme atmosphere layer: a fixed, decorative-only backdrop that
+   * gives each theme a distinct technical/editorial character beyond
+   * a recolored accent. Never intercepts pointer events and sits
+   * strictly behind #root (z-index: 0 vs #root's 1).
+   */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Midnight: a fine, precise technical grid — the "precision lab" motif. */
+  html[data-theme="midnight"] body::before {
+    background-image:
+      linear-gradient(to right, rgb(var(--tf-border) / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--tf-border) / 0.5) 1px, transparent 1px);
+    background-size: 64px 64px;
+    opacity: 0.35;
+  }
+
+  /* Emerald: a sparser dot grid with a faint accent tint — a touch more energetic. */
+  html[data-theme="emerald"] body::before {
+    background-image: radial-gradient(circle, rgb(var(--tf-accent) / 0.5) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.2;
+  }
+
+  /* Paper: intentionally flat — no technical grid, just the editorial/print surface. */
+  html[data-theme="paper"] body::before {
+    background: none;
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-text-primary;
+  }
+
+  /* Visible, deliberate focus states everywhere */
+  :focus-visible {
+    outline: 2px solid rgb(var(--tf-accent));
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /*
+   * Print stylesheet — used by CertificatePage's "Print" action (and
+   * any browser-native print of that page). Strips every bit of app
+   * chrome so only the certificate itself ends up on paper: no navbar,
+   * no footer, no on-screen controls, no theme background/atmosphere
+   * layer, and no page-splitting mid-certificate.
+   */
+  @media print {
+    header,
+    footer,
+    .tf-no-print {
+      display: none !important;
+    }
+
+    body,
+    body::before {
+      background: #ffffff !important;
+    }
+
+    main {
+      padding: 0 !important;
+    }
+
+    .tf-certificate-print-area {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+  }
+}
+
+@layer base {
+  /* Paper: a thin masthead rule under the header, echoing print
+     mastheads — Midnight/Emerald keep the plain 1px border instead. */
+  html[data-theme="paper"] header {
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(var(--tf-text-primary));
+  }
+
+  /* Emerald: primary buttons get a faint accent glow — a touch more
+     energetic than Midnight's flat, restrained surfaces. */
+  html[data-theme="emerald"] .tf-glow-accent {
+    box-shadow: 0 0 0 1px rgb(var(--tf-accent) / 0.4), 0 4px 16px -4px rgb(var(--tf-accent) / 0.35);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
